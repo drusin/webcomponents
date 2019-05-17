@@ -22,7 +22,7 @@ class CounterElement extends HTMLElement {
 	}
 	
 	get number() {
-		return this.getAttribute('number');
+		return parseInt(this.getAttribute('number'));
 	}
 	
 	set number(val) {
@@ -30,31 +30,26 @@ class CounterElement extends HTMLElement {
 	}
 	
 	_add() {
-		this.number = parseInt(this.number) + 1;
+		this.number = this.number + 1;
 	}
 	
 	_sub() {
-		this.number = parseInt(this.number) - 1;
+		this.number = this.number - 1;
 	}
 	
 	static get observedAttributes() {
 		return ['number'];
 	}
 	
+	_attributeChanges = {
+		number: newValue => this._numberElement.innerText = newValue
+	};
+	
 	attributeChangedCallback(name, oldValue, newValue) {
-		switch (name){
-			case 'number':
-				this._numberElement.innerText = newValue;
-				break;
-		}
+		const update = this._attributeChanges[name] ? this._attributeChanges[name] : () => {};
+		
+		update(newValue, oldValue);
 	}
 }
 
-export default function defineCounter() {
-	try {
-		window.customElements.define('counter-element', CounterElement);
-	}
-	catch (e) {
-		console.log('counter-element is already defined');
-	}
-}
+window.customElements.define('counter-element', CounterElement);
